@@ -1,0 +1,205 @@
+Codexion
+Master the race for resources before the deadline
+masters you
+Summary: Race against time in this thrilling concurrency challenge! Orchestrate
+multiple coders competing for limited USB dongles using POSIX threads, mutexes, and
+smart scheduling—master resource synchronization before burnout strikes.
+
+
+Overview
+Here are the things you need to know if you want to succeed in this assignment:
+• One or more coders sit in a circular inclusive co-working hub.
+In the center, there is a shared Quantum Compiler.
+• The coders alternatively compile, debug, or refactor.
+While compiling, they are not debugging nor refactoring;
+while debugging, they are not compiling nor refactoring;
+and, of course, while refactoring, they are not compiling nor debugging.
+• There are USB dongles on the table. There are as many dongles as coders.
+• Compiling quantum code requires two dongles plugged in simultaneously,
+one in each hand: a coder takes their left and right dongles to compile.
+• When a coder finishes compiling, they put both dongles back on the table and start
+debugging.
+Once debugging is done, they start refactoring. The simulation stops when a coder
+burns out due to lack of compiling.
+• Every coder needs to compile regularly and should never burn out.
+• Coders do not communicate with each other.
+• Coders do not know if another coder is about to burn out.
+• Needless to say, coders should avoid burnout!
+
+Global rules
+You have to write one program that complies with the following rules:
+• Global variables are forbidden!
+• Your program must take the following arguments (all mandatory):
+number_of_coders time_to_burnout time_to_compile time_to_debug
+time_to_refactor number_of_compiles_required dongle_cooldown scheduler
+◦ number_of_coders: The number of coders and also the number of dongles.
+◦ time_to_burnout (in milliseconds): If a coder did not start compiling within
+time_to_burnout milliseconds since the beginning of their last compile or the
+beginning of the simulation, they burn out.
+◦ time_to_compile (in milliseconds): The time it takes for a coder to compile.
+During that time, they must hold two dongles.
+◦ time_to_debug (in milliseconds): The time a coder will spend debugging.
+◦ time_to_refactor (in milliseconds): The time a coder will spend refactoring.
+After completing the refactoring phase, the coder will immediately attempt to
+acquire dongles and start compiling again.
+◦ number_of_compiles_required: If all coders have compiled at least this
+many times, the simulation stops. Otherwise, it stops when a coder burns
+out.
+◦ dongle_cooldown (in milliseconds): After being released, a dongle is unavailable until its cooldown has passed.
+◦ scheduler: The arbitration policy used by dongles to decide who gets them
+when multiple coders request them.
+The value must be exactly one of: fifo or edf.
+fifo means First In, First Out: the dongle is granted to the coder whose
+request arrived first.
+edf means Earliest Deadline First with deadline = last_compile_start +
+time_to_burnout.
+• Each coder has a number ranging from 1 to number_of_coders.
+• Coder number 1 sits next to coder number number_of_coders.
+Any other coder number N sits between coder number N - 1 and coder number N
++ 1.
+
+About the logs of your program:
+• Any state change of a coder must be formatted as follows:
+◦ timestamp_in_ms X has taken a dongle
+◦ timestamp_in_ms X is compiling
+◦ timestamp_in_ms X is debugging
+◦ timestamp_in_ms X is refactoring
+◦ timestamp_in_ms X burned out
+Replace timestamp_in_ms with the current timestamp in milliseconds
+and X with the coder number.
+• A displayed state message should not be mixed up with another message.
+• A message announcing that a coder burned out should be displayed no more than
+10 ms after the actual burnout.
+• Again, coders should avoid burning out!
+
+Example of the expected log format:
+
+0 1 has taken a dongle
+1 1 has taken a dongle
+1 1 is compiling
+201 1 is debugging
+401 1 is refactoring
+402 2 has taken a dongle
+403 2 has taken a dongle
+403 2 is compiling
+603 2 is debugging
+803 2 is refactoring
+1204 3 burned out
+
+Note : Precision requirement: Burnout logs must be displayed within 10 ms
+of the actual burnout time. Allow a minimal tolerance when testing,
+as hardware and OS scheduling may slightly affect measured timings.
+
+Note : Timing consideration: To reduce hardware impact on performance
+measurements, consider using CPU usage time instead of real-time
+clock when feasible. However, for this project, real-time
+measurements using gettimeofday() are acceptable and recommended
+for simplicity.
+
+
+
+                        Mandatory part : 
+Program Name codexion
+Files to Submit : Makefile at the root, *.c and *.h in the folder of
+your choice
+External Function : pthread_create, pthread_join, pthread_mutex_init,
+pthread_mutex_lock,
+pthread_mutex_unlock, pthread_mutex_destroy,
+pthread_cond_init,
+pthread_cond_wait, pthread_cond_timedwait,
+pthread_cond_signal,
+pthread_cond_broadcast, pthread_cond_destroy,
+gettimeofday, clock_gettime,
+usleep, write, malloc, free, printf, fprintf,
+strcmp, strlen, atoi, memset
+Description :Coders with threads and mutexes (C)
+
+
+The specific rules for the mandatory part are:
+• Each coder must be represented by a thread (using pthread_create).
+• There is one dongle between each pair of coders. Therefore, if there are several
+coders, each coder has a dongle on their left side and a dongle on their right side.
+If there is only one coder, there should be only one dongle on the table.
+• To prevent coders from duplicating dongles, you must protect each dongle’s state
+with a mutex (pthread_mutex_t). A condition variable (pthread_cond_t) may be
+used to manage waiting queues.
+• Dongle cooldown is mandatory: after a coder releases a dongle, the dongle
+cannot be taken again until dongle_cooldown milliseconds have elapsed.
+• Fair arbitration is mandatory: when multiple coders request the same dongle,
+the dongle must grant access according to scheduler.
+With fifo, serve requests in arrival order.
+With edf, serve the coder with the earliest burnout deadline (i.e., last_compile_start
++ time_to_burnout).
+
+Note : Due to timestamp precision, equal deadlines may rarely occur
+in practice. The tie-breaker rule is required to ensure a fully
+deterministic EDF policy, even in edge cases.
+
+• The program must guarantee liveness: no coder should be starved of dongles and
+burn out under edf scheduling, provided the parameters are feasible.
+• A separate monitor thread must detect burnout precisely and stop the simulation.
+The burnout log must be printed within 10 ms of the actual burnout time.
+• Logging must be serialized so that two messages never interleave on a single line
+(use a mutex to protect output).
+• The simulation stops either when a coder burns out or when every coder has compiled at least number_of_compiles_required times.
+• Your code must compile with -Wall -Wextra -Werror -pthread.
+• You must implement a priority queue (heap) for FIFO/EDF scheduling (no standard library priority queue may be used).
+• All memory must be properly allocated and freed (no memory leaks).
+
+Example of simulation run:
+0 1 has taken a dongle
+2 1 has taken a dongle
+2 1 is compiling
+202 1 is debugging
+402 1 is refactoring
+405 2 has taken a dongle
+406 2 has taken a dongle
+406 2 is compiling
+606 2 is debugging
+806 2 is refactoring
+900 3 has taken a dongle
+902 3 has taken a dongle
+902 3 is compiling
+1102 3 is debugging
+1302 3 is refactoring
+1505 4 burned out
+
+Note: This example illustrates the sequence of actions for multiple coders.
+Note how each "compiling" action is preceded by two "has taken a
+dongle" lines, and how the "burned out" message appears at the moment
+a coder misses their deadline.'
+
+
+codexion/
+
+├── Makefile
+
+├── includes/
+
+│   └── codexion.h
+
+└── srcs/
+
+    ├── main.c
+
+    ├── parsing.c
+
+    ├── time_utils.c
+
+    ├── logging.c
+
+    ├── heap.c
+
+    ├── dongle.c
+
+    ├── acquire.c
+
+    ├── coder.c
+
+    ├── monitor.c
+
+    ├── simulation.c
+
+    ├── init.c
+
+    └── cleanup.c
