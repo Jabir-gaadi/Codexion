@@ -59,7 +59,11 @@ static void	swap_requests(t_heap *heap, int first, int second)
 	heap->items[second]->heap_index = second;
 }
 
+<<<<<<< HEAD
 static void	shift_up(t_heap *heap, int index)
+=======
+void	shift_up(t_heap *heap, int index)
+>>>>>>> origin/master
 {
 	int	parent;
 
@@ -80,11 +84,20 @@ int	heap_init(t_heap *heap, int capacity, t_scheduler scheduler)
 {
 	t_request	**request_arr;
 
+<<<<<<< HEAD
+=======
+	if ((scheduler != CODEX_EDF) && (scheduler != CODEX_FIFO))
+		return (0);
+>>>>>>> origin/master
 	if (heap == NULL)
 		return (0);
 	if (capacity <= 0)
 		return (0);
+<<<<<<< HEAD
 	if (capacity > SIZE_MAX / sizeof(*request_arr))
+=======
+	if ((unsigned long)capacity > SIZE_MAX / sizeof(*request_arr))
+>>>>>>> origin/master
 		return (0);
 	request_arr = malloc((capacity * sizeof(*request_arr)));
 	if (request_arr == NULL)
@@ -95,3 +108,87 @@ int	heap_init(t_heap *heap, int capacity, t_scheduler scheduler)
 	heap->scheduler = scheduler;
 	return (1);
 }
+<<<<<<< HEAD
+=======
+
+int	heap_push(t_heap *heap, t_request *request)
+{
+	int	idx;
+
+	if ((heap == NULL) || (request == NULL))
+		return (0);
+	if (heap->items == NULL)
+		return (0);
+	if ((heap->size < 0) || (heap->size >= heap->capacity))
+		return (0);
+	idx = heap->size;
+	heap->items[idx] = request;
+	request->heap_index = idx;
+	heap->size++;
+	shift_up(heap, idx);
+	return (1);
+}
+
+void	shift_down(t_heap *heap, int index)
+{
+	int	left_idx;
+	int	right_idx;
+	int selected;
+
+	while (1)
+	{
+		left_idx = index * 2 + 1;
+		right_idx = index * 2 + 2;
+		selected = index;
+		if ((left_idx < heap->size) && (request_with_priority(heap->items[left_idx], heap->items[selected], heap->scheduler)))
+			selected = left_idx;
+		if ((right_idx < heap->size) && (request_with_priority(heap->items[right_idx], heap->items[selected], heap->scheduler)))
+			selected = right_idx;
+		if (selected == index)
+			break;
+		swap_requests(heap, index, selected);
+		index = selected;
+	}
+}
+
+t_request	*heap_pop(t_heap *heap)
+{
+	t_request *tmp_request;
+
+	if (heap == NULL)
+		return (NULL);
+	if (heap->items == NULL)
+		return (NULL);
+	if (heap->size == 0)
+		return (NULL);
+	tmp_request = heap->items[0];
+	heap->size--;
+	if (heap->size > 0)
+	{
+		heap->items[0] = heap->items[heap->size];
+		heap->items[0]->heap_index = 0;
+		shift_down(heap, 0);
+	}
+	heap->items[heap->size] = NULL;
+	tmp_request->heap_index = -1;
+	return (tmp_request);
+}
+
+void	heap_destroy(t_heap *heap)
+{
+	int	i;
+
+	if (heap == NULL)
+		return ;
+	i = 0;
+	while(i < heap->size)
+	{
+		heap->items[i]->heap_index = -1;
+		i++;
+	}
+	free(heap->items);
+	heap->items = NULL;
+	heap->size = 0;
+	heap->capacity = 0;
+}
+>>>>>>> origin/master
