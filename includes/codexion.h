@@ -19,11 +19,10 @@
 # include <stdlib.h>
 # include <sys/time.h>
 # include <time.h>
-<<<<<<< HEAD
 #include <stdint.h>
 
 
-=======
+
 # include <stdint.h>
 # include <pthread.h>
 
@@ -40,7 +39,7 @@
 // t_coder points back to t_sim
 // t_coder points to its two t_dongle objects
 // t_dongle owns one request heap
->>>>>>> origin/master
+
 typedef enum e_scheduler
 {
 	CODEX_FIFO,
@@ -75,9 +74,7 @@ typedef struct s_heap
 	t_scheduler		scheduler;
 }	t_heap;
 
-<<<<<<< HEAD
-int	parse_args(int ac, char **av, t_config *config);
-=======
+
 typedef struct  s_dongle
 {
 	int				id;
@@ -87,7 +84,7 @@ typedef struct  s_dongle
 	t_heap			queue;
 }	t_dongle;
 
-struct s_sim	sim;
+struct s_sim;
 
 typedef struct s_coder
 {
@@ -132,16 +129,30 @@ typedef struct s_sim
 }	t_sim;
 
 int	parse_args(int ac, char *av[], t_config *config);
+int	get_time_in_ms(long long *result);
+int	add_time_ms(long long base, long long duration, long long *result);
+int	ms_to_timespec(long long ms_time, struct timespec *result);
 int	request_with_priority(const	t_request *x, const t_request *y, t_scheduler scheduler);
 int	heap_init(t_heap *heap, int capacity, t_scheduler scheduler);
 int	heap_push(t_heap *heap, t_request *request);
+t_request	*heap_peek(t_heap *heap);
+int	heap_remove(t_heap *heap, t_request *request);
 void	shift_down(t_heap *heap, int index);
 void	shift_up(t_heap *heap, int index);
 t_request	*heap_pop(t_heap *heap);
 void	heap_destroy(t_heap *heap);
 int	dongle_init(t_dongle *dongle, int id, t_scheduler scheduler);
 void	dongle_destroy(t_dongle *dongle);
-
->>>>>>> origin/master
+void	*coder_routine(void *args);
+void	*monitor_routine(void *args);
+int	sim_init(t_sim *sim, const t_config *config);
+int	sim_release_start(t_sim *sim);
+void	sim_destroy(t_sim *sim);
+int sim_start_threads(t_sim *sim);
+void	wait_for_start(t_sim *sim);
+int	sim_release_start(t_sim *sim);
+int	sim_join_threads(t_sim *sim);
+int	sim_request_stop(t_sim *sim, t_stop_reason reason,
+		int coder_id, long long terminal_time);
 
 #endif

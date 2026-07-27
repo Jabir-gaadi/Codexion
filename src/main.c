@@ -18,5 +18,11 @@ int	main(int ac, char **av)
 
 	if (parse_args(ac, av, &config) == 0)
 		return (1);
+	t_sim	sim;
+	if (sim_init(&sim, &config) == 0)
+	{
+		printf("problem in sim_init");
+		return (1);
+	}
 	printf("all ok?");
 }

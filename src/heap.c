@@ -59,11 +59,7 @@ static void	swap_requests(t_heap *heap, int first, int second)
 	heap->items[second]->heap_index = second;
 }
 
-<<<<<<< HEAD
-static void	shift_up(t_heap *heap, int index)
-=======
 void	shift_up(t_heap *heap, int index)
->>>>>>> origin/master
 {
 	int	parent;
 
@@ -84,20 +80,13 @@ int	heap_init(t_heap *heap, int capacity, t_scheduler scheduler)
 {
 	t_request	**request_arr;
 
-<<<<<<< HEAD
-=======
 	if ((scheduler != CODEX_EDF) && (scheduler != CODEX_FIFO))
 		return (0);
->>>>>>> origin/master
 	if (heap == NULL)
 		return (0);
 	if (capacity <= 0)
 		return (0);
-<<<<<<< HEAD
-	if (capacity > SIZE_MAX / sizeof(*request_arr))
-=======
 	if ((unsigned long)capacity > SIZE_MAX / sizeof(*request_arr))
->>>>>>> origin/master
 		return (0);
 	request_arr = malloc((capacity * sizeof(*request_arr)));
 	if (request_arr == NULL)
@@ -108,8 +97,6 @@ int	heap_init(t_heap *heap, int capacity, t_scheduler scheduler)
 	heap->scheduler = scheduler;
 	return (1);
 }
-<<<<<<< HEAD
-=======
 
 int	heap_push(t_heap *heap, t_request *request)
 {
@@ -191,4 +178,43 @@ void	heap_destroy(t_heap *heap)
 	heap->size = 0;
 	heap->capacity = 0;
 }
->>>>>>> origin/master
+
+t_request	*heap_peek(t_heap *heap)
+{
+	if (heap == NULL)
+		return (NULL);
+	if (heap->items == NULL)
+		return (NULL);
+	if (heap->size == 0)
+		return (NULL);
+	return (heap->items[0]);
+}
+
+int	heap_remove(t_heap *heap, t_request *request)
+{
+	int	index;
+
+	if (heap == NULL || request == NULL)
+		return (0);
+	if (heap->items == NULL || heap->size == 0)
+		return (0);
+	index = request->heap_index;
+	if (index < 0 || index >= heap->size)
+		return (0);
+	if (heap->items[index] != request)
+		return (0);
+	heap->size--;
+	if (index != heap->size)
+	{
+		heap->items[index] = heap->items[heap->size];
+		heap->items[index]->heap_index = index;
+		if ((index > 0) && request_with_priority(heap->items[index],
+			heap->items[(index - 1) / 2], heap->scheduler))
+			shift_up(heap, index);
+		else
+			shift_down(heap, index);
+		}
+	heap->items[heap->size] = NULL;
+	request->heap_index = -1;
+	return (1);
+}
