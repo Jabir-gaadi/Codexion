@@ -19,10 +19,11 @@
 # include <stdlib.h>
 # include <sys/time.h>
 # include <time.h>
-#include <stdint.h>
+# include <stdint.h>
+# include <math.h>
 
 
-
+# include <unistd.h>
 # include <stdint.h>
 # include <pthread.h>
 
@@ -142,6 +143,7 @@ void	shift_up(t_heap *heap, int index);
 t_request	*heap_pop(t_heap *heap);
 void	heap_destroy(t_heap *heap);
 int	dongle_init(t_dongle *dongle, int id, t_scheduler scheduler);
+int	release_dongles_basic(t_coder *coder);
 void	dongle_destroy(t_dongle *dongle);
 void	*coder_routine(void *args);
 void	*monitor_routine(void *args);
@@ -154,5 +156,9 @@ int	sim_release_start(t_sim *sim);
 int	sim_join_threads(t_sim *sim);
 int	sim_request_stop(t_sim *sim, t_stop_reason reason,
 		int coder_id, long long terminal_time);
+int	sim_sleep(t_sim	*sim, long long duration);
+int	log_action(t_sim *sim, int coder_id, const char *message);
+int	take_dongles_basic(t_coder *coder);
+int	sim_is_running(t_sim *sim);
 
 #endif

@@ -38,41 +38,45 @@ void	dongle_destroy(t_dongle *dongle)
     pthread_mutex_destroy(&dongle->mutex);
 }
 
-int	heap_remove(t_heap *heap, t_request *request)
+int	release_dongles_basic(t_coder *coder)
 {
-    int idx;
-    int parent;
-    int moved;
+    t_dongle    *first;
+    t_dongle    *second;
+    long long   current_time;
+    long long   available_time;
 
-    moved = 0;
-    if (heap == NULL || heap->items == NULL)
+    if (coder == NULL || coder->sim == NULL)
         return (0);
-    if (heap->size == 0)
+    if (coder->left == NULL || coder->right == NULL)
+		return (0);
+    if (coder->left == coder->right)
         return (0);
-    if (request == NULL)
-        return (0);
-    idx = request->heap_index;
-    if (idx < 0 || idx >= heap->size || heap->items[idx] != request)
-        return (0);
-    if (idx < 0 || idx >= heap->size)
-        return (0);
-    heap->size--;
-    if (idx != heap->size)
+    if (coder->left->id < coder->right->id)
     {
-        moved = 1;
-        heap->items[idx] = heap->items[heap->size];
-        heap->items[idx]->heap_index = idx;
+        first = coder->left;
+        second = coder->right;
     }
-    request->heap_index = -1;
-    heap->items[heap->size] = NULL;
-    if (moved)
+    else
     {
-        parent = (idx - 1) / 2;
-        if (idx > 0 && request_with_priority(heap->items[idx],
-        heap->items[parent], heap->scheduler))
-            shift_up(heap, idx);
-        else
-            shift_down(heap, idx);
+        first = coder->right;
+        second = coder->left;
     }
+    pthread_mutex_lock(&first->mutex);
+    pthread_mutex_lock(&second->mutex);
+    if ((get_time_in_ms(&current_time) == 0)
+        || (add_time_ms(current_time,
+            coder->sim->config.dongle_cooldown,
+            &available_time) == 0))
+    {
+        pthread_mutex_unlock(&second->mutex);
+        pthread_mutex_unlock(&first->mutex);
+        return (0);
+    }
+    coder->left->hold = 0;
+    coder->right->hold = 0;
+    coder->left->available_ms = available_time;
+    coder->right->available_ms = available_time;
+    pthread_mutex_unlock(&second->mutex);
+    pthread_mutex_unlock(&first->mutex);
     return (1);
 }

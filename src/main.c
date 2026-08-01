@@ -15,14 +15,21 @@
 int	main(int ac, char **av)
 {
 	t_config	config;
+	t_sim		sim;
+	int			is_joined;
 
 	if (parse_args(ac, av, &config) == 0)
 		return (1);
-	t_sim	sim;
 	if (sim_init(&sim, &config) == 0)
+		return (2);
+	if (sim_start_threads(&sim) == 0)
 	{
-		printf("problem in sim_init");
-		return (1);
+		sim_destroy(&sim);
+		return (3);
 	}
-	printf("all ok?");
+	is_joined = sim_join_threads(&sim);
+	sim_destroy(&sim);
+	if (is_joined == 0)
+		return (4);
+	return (0);
 }
