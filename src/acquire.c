@@ -1,81 +1,12 @@
 #include "../includes/codexion.h"
 
-// static int	prepare_request_pair(t_coder *coder)
-// {
-//     long long   sequence;
-
-//     if (coder == NULL || coder->sim == NULL)
-//         return (0);
-//     if (coder->left_request.heap_index != -1 || coder->right_request.heap_index != -1)
-//         return (0);
-//     if (coder->sim->global_sequence == LLONG_MAX)
-//         return (0);
-//     sequence = coder->sim->global_sequence;
-//     coder->sim->global_sequence++;
-//     coder->left_request.coder_id = coder->id;
-//     coder->left_request.sequence = sequence;
-//     coder->left_request.deadline = coder->deadline;
-//     coder->left_request.heap_index = -1;
-//     coder->right_request.coder_id = coder->id;
-//     coder->right_request.sequence = sequence;
-//     coder->right_request.deadline = coder->deadline;
-//     coder->right_request.heap_index = -1;
-//     return (1);
-// }
-
-// static int	queue_request_pair(t_coder *coder)
-// {
-//     if (coder == NULL || coder->sim == NULL)
-//         return (0);
-//     if (coder->left == NULL || coder->right == NULL)
-// 	    return (0);
-//     if (coder->left == coder->right)
-//         return (0);
-//     if (heap_push(&coder->left->queue, &coder->left_request) == 0)
-//         return (0);
-//     if (heap_push(&coder->right->queue, &coder->right_request) == 0)
-//     {
-//         heap_remove(&coder->left->queue, &coder->left_request);
-//         return (0);
-//     }
-//     return (1);
-// }
-
-// static void	cancel_request_pair(t_coder *coder)
-// {
-//     if (coder == NULL)
-//         return ;
-//     if (coder->left && coder->left_request.heap_index != -1)
-//         heap_remove(&coder->left->queue, &coder->left_request);
-//     if (coder->right && coder->right_request.heap_index != -1)
-//         heap_remove(&coder->right->queue, &coder->right_request);
-// }
-
-// static int	request_pair_is_ready(t_coder *coder)
-// {
-// 	if (coder == NULL)
-// 		return (0);
-// 	if (coder->left == NULL || coder->right == NULL)
-// 		return (0);
-// 	if (coder->left == coder->right)
-// 		return (0);
-// 	if (coder->left_request.heap_index == -1
-// 		|| coder->right_request.heap_index == -1)
-// 		return (0);
-// 	if (heap_peek(&coder->left->queue) != &coder->left_request)
-// 		return (0);
-// 	if (heap_peek(&coder->right->queue) != &coder->right_request)
-// 		return (0);
-// 	return (1);
-// }
-
 static int register_a_request(t_coder *coder,
 	t_dongle *first,
 	t_dongle *second,
 	t_request *first_req,
 	t_request *second_req)
 {
-	int			sequenece;
+	long long	sequenece;
 	int			valid;
 
 	pthread_mutex_lock(&coder->sim->state_mutex);

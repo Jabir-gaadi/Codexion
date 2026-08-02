@@ -1,7 +1,7 @@
 NAME = codexion
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -pthread
+CFLAGS = -Wall -Wextra -Werror -pthread -fsanitize=thread -g
 
 SRC = src/main.c \
       src/parsing.c \
@@ -13,7 +13,9 @@ SRC = src/main.c \
 	  src/monitor.c \
 	  src/simulation.c \
 	  src/logging.c \
-	  src/acquire.c
+	  src/acquire.c \
+	  src/init2.c \
+	  src/libcodexion.c
 
 OBJ = $(SRC:.c=.o)
 

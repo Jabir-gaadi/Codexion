@@ -31,9 +31,9 @@ static int	parse_numbers(const char *str, long long max, long long *result)
 			return (0);
 		digit = str[i] - '0';
 		if (value > max / 10)
-			return (0);
+			return (4);
 		if ((value == max / 10) && (digit > max % 10))
-			return (0);
+			return (4);
 		value = value * 10 + digit;
 		i++;
 	}
@@ -61,11 +61,18 @@ static int	parse_scheduler(const char *str, t_scheduler *scheduler)
 static int	parse_numeric_args(const char *str, int index, long long *value)
 {
 	long long	max;
+	int			check;
 
 	max = LLONG_MAX;
 	if (index == 1 || index == 6)
 		max = INT_MAX;
-	if (!(parse_numbers(str, max, value)))
+	check = parse_numbers(str, max, value);
+	if (check == 4)
+	{
+		printf("ARGument number %d can overflow!\n", index);
+		return (0);
+	}
+	if (check == 0)
 		return (0);
 	if ((index == 1) && (*value < 1))
 		return (0);
@@ -101,13 +108,13 @@ int	parse_args(int ac, char *av[], t_config *config)
 	i = 1;
 	while (i < 8)
 	{
-		if (!(parse_numeric_args(av[i], i, &value)))
-			return (0);
+		if ((parse_numeric_args(av[i], i, &value)) == 0)
+			return (2);
 		fill_config(i, value, &tmp);
 		i++;
 	}
-	if (!(parse_scheduler(av[8], &(tmp.scheduler))))
-		return (0);
+	if ((parse_scheduler(av[8], &(tmp.scheduler))) != 1)
+		return (3);
 	*config = tmp;
 	return (1);
 }

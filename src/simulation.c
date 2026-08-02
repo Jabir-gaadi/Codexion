@@ -1,16 +1,29 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   simulation.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jgaadi <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/02 11:50:56 by jgaadi            #+#    #+#             */
+/*   Updated: 2026/08/02 11:50:58 by jgaadi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/codexion.h"
 
 int	sim_release_start(t_sim *sim)
 {
-    long long	current_time;
+	long long	current_time;
 	long long	initial_deadline;
 	int			idx;
 
-    if (sim == NULL)
+	if (sim == NULL)
 		return (0);
 	if (!get_time_in_ms(&current_time))
 		return (0);
-	if (!add_time_ms(current_time, sim->config.time_to_burnout, &initial_deadline))
+	if (!add_time_ms(current_time, sim->config.time_to_burnout,
+			&initial_deadline))
 		return (0);
 	pthread_mutex_lock(&sim->start_mutex);
 	sim->start_time = current_time;
@@ -55,7 +68,8 @@ int	sim_sleep(t_sim	*sim, long long duration)
 	struct timespec	ts;
 
 	completed = 0;
-	get_time_in_ms(&current_time);
+	if (get_time_in_ms(&current_time) == 0)
+		sim_request_stop(sim, STOP_ERROR, 0, 0);
 	add_time_ms(current_time, duration, &end_time);
 	ms_to_timespec(end_time, &ts);
 	pthread_mutex_lock(&sim->state_mutex);
@@ -63,7 +77,7 @@ int	sim_sleep(t_sim	*sim, long long duration)
 	{
 		get_time_in_ms(&current_time);
 		if (current_time >= end_time)
-			break;
+			break ;
 		pthread_cond_timedwait(&sim->monitor_cond, &sim->state_mutex, &ts);
 	}
 	if (sim->stop_reason == STOP_NONE && current_time >= end_time)

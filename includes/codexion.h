@@ -21,8 +21,6 @@
 # include <time.h>
 # include <stdint.h>
 # include <math.h>
-
-
 # include <unistd.h>
 # include <stdint.h>
 # include <pthread.h>
@@ -75,8 +73,7 @@ typedef struct s_heap
 	t_scheduler		scheduler;
 }	t_heap;
 
-
-typedef struct  s_dongle
+typedef struct s_dongle
 {
 	int				id;
 	int				hold;
@@ -85,7 +82,7 @@ typedef struct  s_dongle
 	t_heap			queue;
 }	t_dongle;
 
-struct s_sim;
+struct	s_sim;
 
 typedef struct s_coder
 {
@@ -129,36 +126,40 @@ typedef struct s_sim
 	pthread_t			monitor_thread;
 }	t_sim;
 
-int	parse_args(int ac, char *av[], t_config *config);
-int	get_time_in_ms(long long *result);
-int	add_time_ms(long long base, long long duration, long long *result);
-int	ms_to_timespec(long long ms_time, struct timespec *result);
-int	request_with_priority(const	t_request *x, const t_request *y, t_scheduler scheduler);
-int	heap_init(t_heap *heap, int capacity, t_scheduler scheduler);
-int	heap_push(t_heap *heap, t_request *request);
+int			parse_args(int ac, char *av[], t_config *config);
+int			get_time_in_ms(long long *result);
+int			add_time_ms(long long base, long long duration, long long *result);
+int			ms_to_timespec(long long ms_time, struct timespec *result);
+int			request_with_priority(const	t_request *x,
+				const t_request *y, t_scheduler scheduler);
+int			heap_init(t_heap *heap, int capacity, t_scheduler scheduler);
+int			heap_push(t_heap *heap, t_request *request);
 t_request	*heap_peek(t_heap *heap);
-int	heap_remove(t_heap *heap, t_request *request);
-void	shift_down(t_heap *heap, int index);
-void	shift_up(t_heap *heap, int index);
+int			heap_remove(t_heap *heap, t_request *request);
+void		shift_down(t_heap *heap, int index);
+void		shift_up(t_heap *heap, int index);
 t_request	*heap_pop(t_heap *heap);
-void	heap_destroy(t_heap *heap);
-int	dongle_init(t_dongle *dongle, int id, t_scheduler scheduler);
-int	release_dongles_basic(t_coder *coder);
-void	dongle_destroy(t_dongle *dongle);
-void	*coder_routine(void *args);
-void	*monitor_routine(void *args);
-int	sim_init(t_sim *sim, const t_config *config);
-int	sim_release_start(t_sim *sim);
-void	sim_destroy(t_sim *sim);
-int sim_start_threads(t_sim *sim);
-void	wait_for_start(t_sim *sim);
-int	sim_release_start(t_sim *sim);
-int	sim_join_threads(t_sim *sim);
-int	sim_request_stop(t_sim *sim, t_stop_reason reason,
-		int coder_id, long long terminal_time);
-int	sim_sleep(t_sim	*sim, long long duration);
-int	log_action(t_sim *sim, int coder_id, const char *message);
-int	take_dongles_basic(t_coder *coder);
-int	sim_is_running(t_sim *sim);
+void		heap_destroy(t_heap *heap);
+int			dongle_init(t_dongle *dongle, int id, t_scheduler scheduler);
+int			release_dongles_basic(t_coder *coder);
+void		dongle_destroy(t_dongle *dongle);
+void		*coder_routine(void *args);
+void		*monitor_routine(void *args);
+int			sim_init(t_sim *sim, const t_config *config);
+void		init_coder(t_sim *sim, int index);
+int			sim_release_start(t_sim *sim);
+void		sim_destroy(t_sim *sim);
+int			sim_start_threads(t_sim *sim);
+void		wait_for_start(t_sim *sim);
+int			sim_release_start(t_sim *sim);
+int			sim_join_threads(t_sim *sim);
+int			sim_request_stop(t_sim *sim, t_stop_reason reason,
+				int coder_id, long long terminal_time);
+int			sim_sleep(t_sim	*sim, long long duration);
+int			log_action(t_sim *sim, int coder_id, const char *message);
+int			take_dongles_basic(t_coder *coder);
+int			sim_is_running(t_sim *sim);
+void		cleanup_sim_or_destroy(t_sim *sim, int select);
+void	join_coders_threads(t_sim *sim, int total_thread);
 
 #endif
