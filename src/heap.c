@@ -14,7 +14,7 @@
 
 static int	fifo_compare(const t_request *x, const t_request *y)
 {
-	if (x->sequence > y->sequence)
+	if (x->sequence >= y->sequence)
 		return (0);
 	if (x->sequence < y->sequence)
 		return (1);

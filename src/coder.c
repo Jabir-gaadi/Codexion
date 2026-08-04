@@ -6,7 +6,6 @@ void	*coder_routine(void *args)
 	long long	current_time;
 	long long	deadline;
 	int			compile_completed;
-	int			finished;
 
 	if (args == NULL)
 		return (NULL);
@@ -14,6 +13,8 @@ void	*coder_routine(void *args)
 	if (coder->sim == NULL)
 		return (NULL);
 	wait_for_start(coder->sim);
+	if (coder->id % 2 == 0)
+		usleep(500);
 	while (sim_is_running(coder->sim))
 	{
 		if (coder->finished == 1)
@@ -45,7 +46,6 @@ void	*coder_routine(void *args)
 			return (NULL);
 		if (compile_completed == 0)
 			return (NULL);
-
 		// if (finished && !sim_is_running(coder->sim))
 		// 	return (NULL);
 		// if (!sim_is_running(coder->sim))
@@ -62,7 +62,13 @@ void	*coder_routine(void *args)
 		if (sim_sleep(coder->sim,
 				coder->sim->config.time_to_refactor) == 0)
 			return (NULL);
-		if (finished || !sim_is_running(coder->sim))
+		pthread_mutex_lock(&coder->sim->state_mutex);
+		coder->compiles_done++;
+		if (coder->compiles_done == coder->sim->config.number_of_compiles_required)
+			coder->finished = 1;
+		pthread_cond_signal(&coder->sim->monitor_cond);
+		pthread_mutex_unlock(&coder->sim->state_mutex);
+		if (coder->finished || !sim_is_running(coder->sim))
 			return (NULL);
 	}
 	return (NULL);

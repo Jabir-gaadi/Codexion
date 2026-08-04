@@ -20,8 +20,6 @@ int	get_time_in_ms(long long *result)
 	long long			micro_to_ms;
 	long long			ms_time;
 
-	if (result == NULL)
-		return (0);
 	if (gettimeofday(&time_now, NULL) == -1)
 		return (0);
 	time_sec = time_now.tv_sec;
@@ -40,12 +38,6 @@ int	get_time_in_ms(long long *result)
 
 int	add_time_ms(long long base, long long duration, long long *result)
 {
-	if (result == NULL)
-		return (0);
-	if (base < 0)
-		return (0);
-	if (duration < 0)
-		return (0);
 	if (duration > LLONG_MAX - base)
 		return (0);
 	*result = duration + base;
