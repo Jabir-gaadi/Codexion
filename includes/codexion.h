@@ -67,9 +67,8 @@ typedef struct s_request
 
 typedef struct s_heap
 {
-	t_request		**items;
+	t_request		*items[2];
 	int				size;
-	int				capacity;
 	t_scheduler		scheduler;
 }	t_heap;
 
@@ -136,8 +135,6 @@ int			heap_init(t_heap *heap, int capacity, t_scheduler scheduler);
 int			heap_push(t_heap *heap, t_request *request);
 t_request	*heap_peek(t_heap *heap);
 int			heap_remove(t_heap *heap, t_request *request);
-void		shift_down(t_heap *heap, int index);
-void		shift_up(t_heap *heap, int index);
 t_request	*heap_pop(t_heap *heap);
 void		heap_destroy(t_heap *heap);
 int			dongle_init(t_dongle *dongle, int id, t_scheduler scheduler);

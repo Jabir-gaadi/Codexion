@@ -57,7 +57,7 @@ static int	creation_threads(t_sim *sim)
 			break ;
 		success_created++;
 	}
-	if (success_created > sim->config.number_of_coders)
+	if (success_created != sim->config.number_of_coders)
 	{
 		sim->stop_reason = STOP_ERROR;
 		pthread_mutex_lock(&sim->state_mutex);

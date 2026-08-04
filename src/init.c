@@ -12,7 +12,7 @@
 
 #include "../includes/codexion.h"
 
-void	cleanup_sim_or_destroy(t_sim *sim, int select)
+void	init_sim_or_destroy(t_sim *sim, int select)
 {
 	if (select == 0)
 	{
@@ -43,12 +43,12 @@ static int	allocate_sim_array(t_sim *sim)
 	count = sim->config.number_of_coders;
 	sim->dongles = malloc(sizeof(t_dongle) * count);
 	if (sim->dongles == NULL)
-		return (cleanup_sim_or_destroy(sim, 0), 0);
+		return (init_sim_or_destroy(sim, 0), 0);
 	sim->coders = malloc(sizeof(t_coder) * count);
 	if (sim->coders == NULL)
 	{
 		free(sim->dongles);
-		cleanup_sim_or_destroy(sim, 0);
+		init_sim_or_destroy(sim, 0);
 		return (0);
 	}
 	return (1);
@@ -71,7 +71,7 @@ static int	dongles_array_init(t_sim *sim)
 			}
 			free(sim->dongles);
 			free(sim->coders);
-			cleanup_sim_or_destroy(sim, 0);
+			init_sim_or_destroy(sim, 0);
 			return (0);
 		}
 		i++;
@@ -83,14 +83,12 @@ int	sim_init(t_sim *sim, const t_config *config)
 {
 	int	i;
 
-	if (sim == NULL || config == NULL)
-		return (0);
 	sim->config = *config;
 	sim->start_time = 0;
 	sim->global_sequence = 0;
 	sim->stop_reason = STOP_NONE;
 	sim->start_released = 0;
-	cleanup_sim_or_destroy(sim, 1);
+	init_sim_or_destroy(sim, 1);
 	if (allocate_sim_array(sim) == 0)
 		return (0);
 	if (dongles_array_init(sim) == 0)
@@ -120,6 +118,6 @@ void	sim_destroy(t_sim *sim)
 	free(sim->dongles);
 	sim->coders = NULL;
 	sim->dongles = NULL;
-	cleanup_sim_or_destroy(sim, 0);
+	init_sim_or_destroy(sim, 0);
 	return ;
 }

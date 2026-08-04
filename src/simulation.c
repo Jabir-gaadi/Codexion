@@ -18,8 +18,6 @@ int	sim_release_start(t_sim *sim)
 	long long	initial_deadline;
 	int			idx;
 
-	if (sim == NULL)
-		return (0);
 	if (!get_time_in_ms(&current_time))
 		return (0);
 	if (!add_time_ms(current_time, sim->config.time_to_burnout,
