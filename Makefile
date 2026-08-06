@@ -7,6 +7,7 @@ SRC = src/main.c \
       src/parsing.c \
       src/time_utils.c \
       src/heap.c \
+	  src/heap2.c \
       src/dongle.c \
       src/init.c \
 	  src/coder.c \
@@ -34,5 +35,8 @@ fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
+
+nor:
+	norminette src/* includes/codexion.h
 
 .PHONY: all clean fclean re

@@ -156,7 +156,13 @@ int			sim_sleep(t_sim	*sim, long long duration);
 int			log_action(t_sim *sim, int coder_id, const char *message);
 int			take_dongles_basic(t_coder *coder);
 int			sim_is_running(t_sim *sim);
-void		cleanup_sim_or_destroy(t_sim *sim, int select);
-void	join_coders_threads(t_sim *sim, int total_thread);
+void		init_sim_or_destroy(t_sim *sim, int select);
+void		join_coders_threads(t_sim *sim, int total_thread);
+int			is_my_turn(t_dongle *first, t_dongle *second, t_request **arr_req,
+				long long current_time);
+void		claim_dongles(t_dongle *first, t_dongle *second);
+void		cancel_reqeust(t_dongle *first, t_dongle *second,
+				t_request *first_req,
+				t_request *second_req);
 
 #endif
